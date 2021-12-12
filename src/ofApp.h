@@ -50,7 +50,10 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     ofxPanel image_panel;
     ofxPanel cv_panel;
     ofxPanel rd_panel;
+    ofxPanel band_panel;
+    ofxPanel hair_panel;
     bool show_ui = false;
+    int menu_page = 0;
     
     // VIDEO PLAYER
     ofVideoPlayer vid_player;
@@ -65,7 +68,6 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     ofxIntSlider image_g;
     ofxIntSlider image_b;
     ofxIntSlider image_a;
-    
     
     // OPENCV
     ofxCvColorImage cv_color_img;
@@ -82,7 +84,8 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     ofxIntSlider cv_g;
     ofxIntSlider cv_b;
     ofxIntSlider cv_a;
-    
+    ofxToggle cv_rect;
+    ofxToggle cv_blob;
     
     // REACTION DIFFUSION
     float rd_grid[RD_WIDTH][RD_HEIGHT][2];
@@ -103,12 +106,29 @@ class ofApp : public ofBaseApp, public ofxMidiListener{
     ofxIntSlider rd_b;
     ofxIntSlider rd_a;
     
+    // Bands around blobs
+    ofxIntSlider band_r;
+    ofxIntSlider band_g;
+    ofxIntSlider band_b;
+    ofxIntSlider band_a;
+    ofxIntSlider band_n;
+    ofxIntSlider band_size;
+    
+    // Hairy blobs
+    ofxIntSlider hair_r;
+    ofxIntSlider hair_g;
+    ofxIntSlider hair_b;
+    ofxIntSlider hair_a;
+    ofxIntSlider hair_dist;
+    ofxIntSlider hair_size;
+    ofxToggle hair_spiky;
+    ofxToggle hair_pentelho;
+    ofxToggle hair_undulating;
+    
     
     // MIDI IN
     ofxMidiIn midiIn;
     ofxMidiOut midiOut;
     std::vector<ofxMidiMessage> midiMessages;
     std::size_t maxMessages = 10; //< max number of messages to keep track of
-    
-    
 };

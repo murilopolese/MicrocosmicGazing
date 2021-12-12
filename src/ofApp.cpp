@@ -50,6 +50,7 @@ void ofApp::setup(){
 //    int h = cameras[current_camera].getHeight() * 2;
     int w = vid_player.getWidth();
     int h = vid_player.getHeight();
+    
     cv_color_img.allocate(w,h);
     cv_gray_image.allocate(w,h);
     cv_gray_bg.allocate(w,h);
@@ -111,32 +112,32 @@ void ofApp::update() {
     }
     
     // Send midi data
-    float average_x = 0;
-    float average_y = 0;
-    float average_w = 0;
-    float average_h = 0;
-    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
-        ofRectangle r = cv_contour_finder.blobs.at(i).boundingRect;
-        float x = ofMap(r.x, 0, cv_contour_finder.getWidth(), 0, ofGetWidth());
-        float y = ofMap(r.y, 0, cv_contour_finder.getHeight(), 0, ofGetHeight());
-        float w = ofMap(r.width, 0, cv_contour_finder.getWidth(), 0, ofGetWidth());
-        float h = ofMap(r.height, 0, cv_contour_finder.getHeight(), 0, ofGetHeight());
-        average_x += x;
-        average_y += y;
-        average_w += w;
-        average_h += h;
-    }
+//    float average_x = 0;
+//    float average_y = 0;
+//    float average_w = 0;
+//    float average_h = 0;
+//    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
+//        ofRectangle r = cv_contour_finder.blobs.at(i).boundingRect;
+//        float x = ofMap(r.x, 0, cv_contour_finder.getWidth(), 0, ofGetWidth());
+//        float y = ofMap(r.y, 0, cv_contour_finder.getHeight(), 0, ofGetHeight());
+//        float w = ofMap(r.width, 0, cv_contour_finder.getWidth(), 0, ofGetWidth());
+//        float h = ofMap(r.height, 0, cv_contour_finder.getHeight(), 0, ofGetHeight());
+//        average_x += x;
+//        average_y += y;
+//        average_w += w;
+//        average_h += h;
+//    }
+//
+//    average_x /= cv_contour_finder.nBlobs;
+//    average_y /= cv_contour_finder.nBlobs;
+//    average_w /= cv_contour_finder.nBlobs;
+//    average_h /= cv_contour_finder.nBlobs;
     
-    average_x /= cv_contour_finder.nBlobs;
-    average_y /= cv_contour_finder.nBlobs;
-    average_w /= cv_contour_finder.nBlobs;
-    average_h /= cv_contour_finder.nBlobs;
-    
-    midiOut.sendControlChange(2, 0, average_x);
-    midiOut.sendControlChange(2, 1, average_y);
-    midiOut.sendControlChange(2, 2, average_w);
-    midiOut.sendControlChange(2, 3, average_h);
-    midiOut.sendControlChange(2, 4, cv_contour_finder.nBlobs);
+//    midiOut.sendControlChange(2, 0, average_x);
+//    midiOut.sendControlChange(2, 1, average_y);
+//    midiOut.sendControlChange(2, 2, average_w);
+//    midiOut.sendControlChange(2, 3, average_h);
+//    midiOut.sendControlChange(2, 4, cv_contour_finder.nBlobs);
 }
 
 //--------------------------------------------------------------
@@ -151,6 +152,97 @@ void ofApp::draw() {
     ofSetColor(image_r, image_g, image_b, image_a);
     cv_gray_image.draw(0,0,ofGetWidth(),ofGetHeight());
     ofPopStyle();
+    
+    // blob band blend to circle
+//    ofPushStyle();
+//    ofFill();
+//    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
+//        // Draw openCV blobs
+//        ofxCvBlob blob = cv_contour_finder.blobs.at(i);
+//        for (int n = 0; n < band_n; n++) {
+//            ofPolyline shape;
+//            ofSetColor(band_r, band_g, band_b, band_a);
+//            for (int j = 0; j < blob.pts.size(); j++) {
+//                ofVec2f vector = ofVec2f(
+//                  blob.pts.at(j).x - blob.centroid.x,
+//                  blob.pts.at(j).y - blob.centroid.y
+//                );
+//                vector.scale(band_size*n);
+//                vector += blob.centroid;
+//                shape.addVertex(vector.x, vector.y);
+//            }
+//            shape.close();
+//            shape.draw();
+//        }
+//    }
+//    ofPopStyle();
+    
+    // spiky hair
+    ofPushStyle();
+    ofFill();
+    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
+        // Draw openCV blobs
+        ofxCvBlob blob = cv_contour_finder.blobs.at(i);
+        ofPolyline shape;
+        ofSetColor(cv_r, cv_g, cv_b, 255);
+        for (int j = 0; j < blob.pts.size(); j++) {
+            ofVec2f pt = blob.pts.at(j);
+            ofVec2f v = pt - blob.centroid;
+            v.scale(20.0);
+            shape.addVertex(pt.x, pt.y);
+            shape.addVertex(blob.centroid.x + v.x, blob.centroid.y + v.y);
+        }
+        shape.close();
+        shape.draw();
+    }
+    ofPopStyle();
+    
+    // Pentelinho
+//    ofPushStyle();
+//    ofFill();
+//    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
+//        // Draw openCV blobs
+//        ofxCvBlob blob = cv_contour_finder.blobs.at(i);
+//        ofPolyline shape;
+//        ofSetColor(cv_r, cv_g, cv_b, 255);
+//        for (int j = 1; j < blob.pts.size(); j+=1) {
+//            ofVec2f pt1 = blob.pts.at(j-1);
+//            ofVec2f pt2 = blob.pts.at(j);
+//
+//            ofVec2f v1 = pt1 - blob.centroid;
+//            ofVec2f v2 = pt2 - blob.centroid;
+//            ofVec2f v = v2 - v1;
+//            v.scale(10.0);
+//            v = v.getRotated(-45);
+//            shape.addVertex(
+//              pt1.x,
+//              pt1.y
+//            );
+//            shape.addVertex(
+//              pt1.x + v.x,
+//              pt1.y + v.y
+//            );
+//        }
+//        shape.close();
+//        shape.draw();
+//    }
+//    ofPopStyle();
+    
+    // Contour Blob
+//    ofPushStyle();
+//    ofFill();
+//    for (int i = 0; i < cv_contour_finder.nBlobs; i++){
+//        // Draw openCV blobs
+//        ofxCvBlob blob = cv_contour_finder.blobs.at(i);
+//        ofSetColor(cv_r, cv_g, cv_b, 255);
+//        ofBeginShape();
+//        for (int j = 0; j < blob.pts.size(); j+=1) {
+//            ofVec2f pt1 = blob.pts.at(j);
+//            ofVertex(pt1.x, pt1.y);
+//        }
+//        ofEndShape();
+//    }
+//    ofPopStyle();
 
     // openCV blob rectangles
     ofPushStyle();
@@ -186,7 +278,7 @@ void ofApp::draw() {
             } else {
                 ofSetColor(0, 0, 0, rd_a);
             }
-            
+
 
         }
     }
